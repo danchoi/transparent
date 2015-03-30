@@ -12,7 +12,8 @@
   <li tr-repeat="person in party" 
       tr-hide="person.injuries && person.injuries > 9"
       tr-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', injured: person.injuries}"
-      class="replace-this-class">
+      class="replace-this-class"
+      id="id-{{person.name}}">
     <p>Name: <strong tr-insert="person.name">Some body</strong></p>
     <p>Species: <em tr-insert="person.species">Some species</em></p>
     <p tr-show="person.injuries">
