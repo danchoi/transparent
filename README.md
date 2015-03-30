@@ -72,6 +72,7 @@ generates
 ### Merging templates
 
 
+layout.html
 ```html
 <html>
   <head>
@@ -84,6 +85,7 @@ generates
 </html>
 ```
 
+content.html
 ```html
 <html>
   <head>
