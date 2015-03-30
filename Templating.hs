@@ -27,12 +27,12 @@ data TmplRepeatContext = TmplRepeatContext Text Value
     deriving Show
 
 
-showDirective = "t-show"
-hideDirective = "t-hide"
-repeatDirective = "t-repeat"
-insertDirective = "t-insert"
-replaceDirective = "t-replace"
-classDirective = "t-class"
+showDirective = "tr-show"
+hideDirective = "tr-hide"
+repeatDirective = "tr-repeat"
+insertDirective = "tr-insert"
+replaceDirective = "tr-replace"
+classDirective = "tr-class"
 
 processTemplate file context = runX (
     readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] file
