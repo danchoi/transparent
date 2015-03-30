@@ -115,3 +115,27 @@ $ dist merge-templates layout.html content.html
   </body>
 </html>
 ```
+
+Multimerging:
+
+$ multimerge layout.html content.html:content sidebar.html:sidebar
+
+```html
+<html>
+  <head>
+    <title>Layout example</title>
+  </head>
+  <body>
+    <h1>Layout</h1>
+    <div id="content">
+      <p>This is content</p>
+    </div>
+    <nav>
+      <ul id="sidebar">
+        <li>Homepage</li>
+        <li>About</li>
+      </ul>
+    </nav>
+  </body>
+</html>
+```html
