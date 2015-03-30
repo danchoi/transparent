@@ -4,6 +4,15 @@ another templating engine
 
 In progress.
 
+    showDirective = "tr-show"
+    hideDirective = "tr-hide"
+    repeatDirective = "tr-repeat"
+    insertDirective = "tr-insert"
+    replaceDirective = "tr-replace"
+    classDirective = "tr-class"
+    exampleDirective = "tr-example"
+
+
 
 
 ### t-replace
