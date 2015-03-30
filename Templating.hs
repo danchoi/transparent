@@ -33,6 +33,7 @@ repeatDirective = "tr-repeat"
 insertDirective = "tr-insert"
 replaceDirective = "tr-replace"
 classDirective = "tr-class"
+exampleDirective = "tr-example"
 
 processTemplate file context = runX (
     readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] file
@@ -66,7 +67,8 @@ process :: Value -> IOSArrow XmlTree XmlTree
 process context = normalTmplProcess context
 
 normalTmplProcess context = processTopDown (
-      templateRepeat context `when` hasTmplAttr repeatDirective
+      stripExampleElements 
+      >>> templateRepeat context `when` hasTmplAttr repeatDirective
       >>> interpolateValues context 
       >>> templateClass context
       >>> templateShow context 
@@ -74,6 +76,14 @@ normalTmplProcess context = processTopDown (
       >>> templateBind context
       >>> templateReplace context
     )
+
+-- | This strips all elements with the exampleDirective attribute
+
+stripExampleElements :: ArrowXml a => a XmlTree XmlTree
+stripExampleElements =
+     none
+     `when`
+     (hasAttr exampleDirective)
 
 ------------------------------------------------------------------------
 -- general interpolation of {{ }} in text nodes
