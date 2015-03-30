@@ -1,5 +1,5 @@
 {-# LANGUAGE Arrows, QuasiQuotes, OverloadedStrings #-}
-module Ng.Templating where
+module Templating where
 import Data.Maybe (fromJust)
 import Text.XML.HXT.Core
 import Control.Arrow.ArrowList
@@ -18,12 +18,12 @@ import Control.Applicative ((<*), (*>), (<$>), (<*>))
 import Data.Monoid
 import Data.List.Split
 import Data.Scientific 
-import Ng.Expressions
+import Expressions
 
-newtype NgDirective a = NgDirective a
+newtype TmplDirective a = TmplDirective a
     deriving Show
 
-data NgRepeatContext = NgRepeatContext Text Value
+data TmplRepeatContext = TmplRepeatContext Text Value
     deriving Show
 
 processTemplate file context = runX (
@@ -56,7 +56,7 @@ processTemplateWithLayout layoutFile file context = runX (
 
 process :: Value -> IOSArrow XmlTree XmlTree
 process context = 
-    normalNgProcess context
+    normalTmplProcess context
     >>>
     processTopDown (
 
@@ -65,15 +65,15 @@ process context =
       flatten "ng-src" 
     )
 
-normalNgProcess context = processTopDown (
-      ngRepeat context `when` hasNgAttr "ng-repeat"
+normalTmplProcess context = processTopDown (
+      templateRepeat context `when` hasTmplAttr "ng-repeat"
       >>> interpolateValues context 
-      >>> ngClass context
-      >>> ngShow context 
-      >>> ngHide context  
-      >>> ngBind context
-      >>> ngBindHtml context
-      >>> ngBindHtmlUnsafe context
+      >>> templateClass context
+      >>> templateShow context 
+      >>> templateHide context  
+      >>> templateBind context
+      >>> templateBindHtml context
+      >>> templateBindHtmlUnsafe context
     )
 
 ------------------------------------------------------------------------
@@ -88,41 +88,41 @@ interpolateValues context =
    
 interpolateText context = mconcat .  map (evalText context) .  parseText
 
-ngBindBase :: String -> Value -> IOSArrow XmlTree XmlTree
-ngBindBase tag context = 
+templateBindBase :: String -> Value -> IOSArrow XmlTree XmlTree
+templateBindBase tag context = 
     (
-      --txt $< (getAttrValue tag >>> arr (ngEvalToString context) )
+      --txt $< (getAttrValue tag >>> arr (templateEvalToString context) )
       replaceChildren (
-        (getAttrValue tag >>> arr (ngEvalToString context) ) >>> xread
+        (getAttrValue tag >>> arr (templateEvalToString context) ) >>> xread
       ) >>> removeAttr tag
-    ) `when` hasNgAttr tag
+    ) `when` hasTmplAttr tag
 
-ngBind = ngBindBase "ng-bind"
-ngBindHtml = ngBindBase "ng-bind-html"
-ngBindHtmlUnsafe = ngBindBase "ng-bind-html-unsafe"
+templateBind = templateBindBase "ng-bind"
+templateBindHtml = templateBindBase "ng-bind-html"
+templateBindHtmlUnsafe = templateBindBase "ng-bind-html-unsafe"
 
 -- ng-bind-html
 
 -- ng-bind-html-unsafe
 
 ------------------------------------------------------------------------
--- ngShow
-ngShow :: ArrowXml a => Value -> a XmlTree XmlTree
-ngShow context = 
+-- templateShow
+templateShow :: ArrowXml a => Value -> a XmlTree XmlTree
+templateShow context = 
     (
       ((\boolVal -> if boolVal then this else none) 
-        $< (getAttrValue "ng-show" >>> arr (ngEvalToBool context . T.pack))
+        $< (getAttrValue "ng-show" >>> arr (templateEvalToBool context . T.pack))
       ) >>> removeAttr "ng-show"
-    ) `when` hasNgAttr "ng-show"
+    ) `when` hasTmplAttr "ng-show"
 
 -- Not DRY. refactor later
-ngHide :: ArrowXml a => Value -> a XmlTree XmlTree
-ngHide context = 
+templateHide :: ArrowXml a => Value -> a XmlTree XmlTree
+templateHide context = 
     (
       ((\boolVal -> if boolVal then none else this) 
-        $< (getAttrValue "ng-hide" >>> arr (ngEvalToBool context . T.pack))
+        $< (getAttrValue "ng-hide" >>> arr (templateEvalToBool context . T.pack))
       ) >>> removeAttr "ng-hide"
-    ) `when` hasNgAttr "ng-hide"
+    ) `when` hasTmplAttr "ng-hide"
 
 flatten :: ArrowXml a => String -> a XmlTree XmlTree
 flatten name = processAttrl 
@@ -130,7 +130,7 @@ flatten name = processAttrl
       `when` (isElem >>> hasAttr name)
     where replacement = drop 3
 
-ngClass context = 
+templateClass context = 
     (
       ((\newClassNames -> 
         addAttr "class" newClassNames `when` neg (hasName "class")
@@ -139,34 +139,34 @@ ngClass context =
             changeAttrValue (\old -> mconcat [old, " ", newClassNames]) `when` hasName "class"
           )
               -- addAttr "class" classNames
-      ) $< (getAttrValue "ng-class" >>> arr (ngEvalToString context))
+      ) $< (getAttrValue "ng-class" >>> arr (templateEvalToString context))
       ) >>> removeAttr "ng-class"
-    ) `when` hasNgAttr "ng-class"
+    ) `when` hasTmplAttr "ng-class"
      
 ------------------------------------------------------------------------
--- ngRepeat
+-- templateRepeat
 
-ngRepeat :: Value       -- ^ the global context JSON Value
+templateRepeat :: Value       -- ^ the global context JSON Value
          -> IOSArrow XmlTree XmlTree
-ngRepeat context = 
-    (ngRepeatContext context $< ngRepeatKeys context) 
+templateRepeat context = 
+    (templateRepeatContext context $< templateRepeatKeys context) 
 
-ngRepeatKeys :: Value -> IOSArrow XmlTree NgRepeatContext
-ngRepeatKeys outerContext = 
+templateRepeatKeys :: Value -> IOSArrow XmlTree TmplRepeatContext
+templateRepeatKeys outerContext = 
       getAttrValue "ng-repeat" 
       >>> traceValue 2 (show)
-      >>> arr parseNgRepeatExpr
-  where parseNgRepeatExpr :: String -> NgRepeatContext
-        parseNgRepeatExpr = runParse $ do
-          iterVarName <- ngVarName
+      >>> arr parseTmplRepeatExpr
+  where parseTmplRepeatExpr :: String -> TmplRepeatContext
+        parseTmplRepeatExpr = runParse $ do
+          iterVarName <- templateVarName
           spaces >> string "in" >> spaces
-          arrayValue <- flip ngExprEval outerContext <$> ngExpr
-          return $ NgRepeatContext (T.pack iterVarName) arrayValue
+          arrayValue <- flip templateExprEval outerContext <$> templateExpr
+          return $ TmplRepeatContext (T.pack iterVarName) arrayValue
 
-ngRepeatContext :: Value -> NgRepeatContext -> IOSArrow XmlTree XmlTree
-ngRepeatContext c@(Object context) nrp@(NgRepeatContext iterVarName repeatContext) = 
+templateRepeatContext :: Value -> TmplRepeatContext -> IOSArrow XmlTree XmlTree
+templateRepeatContext c@(Object context) nrp@(TmplRepeatContext iterVarName repeatContext) = 
     (\iterVar ->
-      traceMsg 2 ("* ngRepeatContext with ngRepeatKeys " ++ show nrp) 
+      traceMsg 2 ("* templateRepeatContext with templateRepeatKeys " ++ show nrp) 
       >>>
       removeAttr "ng-repeat" 
       >>>
@@ -174,7 +174,7 @@ ngRepeatContext c@(Object context) nrp@(NgRepeatContext iterVarName repeatContex
       in (
 
             ( traceMsg 2 ("nested NGREPEAT context: " ++ (debugJSON mergedContext)) 
-            >>> normalNgProcess mergedContext
+            >>> normalTmplProcess mergedContext
             )
 
         )
@@ -191,11 +191,11 @@ ngRepeatContext c@(Object context) nrp@(NgRepeatContext iterVarName repeatContex
               Array xs -> V.toList xs
               _ -> []
         -- merge iteration object with general context
-ngRepeatContext _ _ = none
+templateRepeatContext _ _ = none
 
 ------------------------------------------------------------------------
 
-hasNgAttr :: ArrowXml a => String -> a XmlTree XmlTree
-hasNgAttr attrName = isElem >>> hasAttr attrName
+hasTmplAttr :: ArrowXml a => String -> a XmlTree XmlTree
+hasTmplAttr attrName = isElem >>> hasAttr attrName
 
 

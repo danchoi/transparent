@@ -1,6 +1,6 @@
 module Main where
-import Ng.Templating
-import Ng.Expressions
+import Templating
+import Expressions
 import System.Environment
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Aeson
