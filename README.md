@@ -53,19 +53,19 @@ them transparently stripped during rendering.
 
 ### dynamic ids
 
-    <li tr-repeat="person in party" id="id-{{person.name}}">
+    <li tr-repeat="person in party" id="person-{{person.name}}">
       <p>Name: <strong tr-insert="person.name">Some body</strong></p>
     </li>
 
 generates 
 
-    <li class="dwarf" id="id-Thorin">
+    <li class="dwarf" id="person-Thorin">
       <p>Name: <strong>Thorin</strong></p>
     </li>
-    <li class="dwarf" id="id-Fili">
+    <li class="dwarf" id="person-Fili">
       <p>Name: <strong>Fili</strong></p>
     </li>
-    <li class="hobbit" id="id-Bilbo">
+    <li class="hobbit" id="person-Bilbo">
       <p>Name: <strong>Bilbo</strong></p>
     </li>
   
