@@ -26,7 +26,7 @@ mergeTemplates (contentFile, idName) =
           processTopDown ((constA contentXml) `when` (isElem >>> hasName "yield" >>> hasAttrValue "id" (== idName)))
       )
       $< (readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] contentFile 
-          >>> (deep (isElem >>> hasAttrValue "id" (== idName))) `when` isElem)
+          >>> (deep (isElem >>> hasAttrValue "id" (== idName))))
     
 
 
