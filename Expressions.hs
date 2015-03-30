@@ -105,7 +105,7 @@ templateBool = Bool <$> ((try (string "true") *> pure True) <|> (try (string "fa
 
 ------------------------------------------------------------------------
 
--- | function to evaluate an ng-expression and a object value context
+-- | function to evaluate a template expression and a object value context
 -- e.g. Value -> "item.name" -> "John"
 templateEvalToString :: Value -> String -> String
 templateEvalToString context exprString = valToString . templateExprEval (runParse templateExpr exprString) $ context
@@ -164,7 +164,6 @@ templateExprEval (Compare op x y) v      =
             "==" -> Bool $ vx == vy
             "!=" -> Bool $ vx /= vy
 
-
 comparableValue :: Value -> ComparableValue
 comparableValue (Number x) = ComparableNumberValue x
 comparableValue (String x) = ComparableStritemplateValue x
@@ -194,7 +193,6 @@ templateEvaluate ((ArrayIndex idx):xs) (Array v) = case V.length v > 0 of
           True -> templateEvaluate xs (v V.! idx)
           False -> Null
 templateEvaluate _ _ = Null
-
 
 
 -- CHANGE TO PARSEC

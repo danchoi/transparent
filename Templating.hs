@@ -26,6 +26,8 @@ newtype TmplDirective a = TmplDirective a
 data TmplRepeatContext = TmplRepeatContext Text Value
     deriving Show
 
+
+
 processTemplate file context = runX (
     readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] file
     >>> 
@@ -55,15 +57,7 @@ processTemplateWithLayout layoutFile file context = runX (
 
 
 process :: Value -> IOSArrow XmlTree XmlTree
-process context = 
-    normalTmplProcess context
-    >>>
-    processTopDown (
-
-      flatten "ng-href" 
-      >>> 
-      flatten "ng-src" 
-    )
+process context = normalTmplProcess context
 
 normalTmplProcess context = processTopDown (
       templateRepeat context `when` hasTmplAttr "ng-repeat"
@@ -124,11 +118,6 @@ templateHide context =
       ) >>> removeAttr "ng-hide"
     ) `when` hasTmplAttr "ng-hide"
 
-flatten :: ArrowXml a => String -> a XmlTree XmlTree
-flatten name = processAttrl 
-      (changeAttrName (const (mkName $ replacement name)))
-      `when` (isElem >>> hasAttr name)
-    where replacement = drop 3
 
 templateClass context = 
     (
