@@ -138,4 +138,4 @@ $ multimerge layout.html content.html:content sidebar.html:sidebar
     </nav>
   </body>
 </html>
-```html
+```
