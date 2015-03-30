@@ -4,13 +4,13 @@ another templating engine
 
 In progress.
 
-    showDirective = "tr-show"
-    hideDirective = "tr-hide"
-    repeatDirective = "tr-repeat"
-    insertDirective = "tr-insert"
-    replaceDirective = "tr-replace"
-    classDirective = "tr-class"
-    exampleDirective = "tr-example"
+    showDirective = "t-show"
+    hideDirective = "t-hide"
+    repeatDirective = "t-repeat"
+    insertDirective = "t-insert"
+    replaceDirective = "t-replace"
+    classDirective = "t-class"
+    exampleDirective = "t-example"
 
 input.html
 
@@ -39,7 +39,7 @@ This directive strips example HTML from the rendered output:
 
 E.g., this HTML element 
 
-    <li tr-example>
+    <li t-example>
       <p>Name: <strong> Spiderman</strong></p>
       <p>Species: <em>Fish</em></p>
       <p>Injuries: Lots of hurt</p>
@@ -53,8 +53,8 @@ them transparently stripped during rendering.
 
 ### dynamic ids
 
-    <li tr-repeat="person in party" id="person-{{person.name}}">
-      <p>Name: <strong tr-insert="person.name">Some body</strong></p>
+    <li t-repeat="person in party" id="person-{{person.name}}">
+      <p>Name: <strong t-insert="person.name">Some body</strong></p>
     </li>
 
 generates 

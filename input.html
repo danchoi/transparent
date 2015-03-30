@@ -7,29 +7,29 @@
   </head>
   <body>
 
-<div>Wizard <span tr-replace="wizard.name">Sauruman</span></div>
+<div>Wizard <span t-replace="wizard.name">Sauruman</span></div>
 <ul>
-  <li tr-repeat="person in party" 
-      tr-hide="person.injuries && person.injuries > 9"
-      tr-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', injured: person.injuries}"
+  <li t-repeat="person in party" 
+      t-hide="person.injuries && person.injuries > 9"
+      t-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', injured: person.injuries}"
       class="replace-this-class"
       id="person-{{person.name}}">
-    <p>Name: <strong tr-insert="person.name">Some body</strong></p>
-    <p>Species: <em tr-insert="person.species">Some species</em></p>
-    <p tr-show="person.injuries">
-        Injuries: <span tr-replace="person.injuries">Some injuries</span>
+    <p>Name: <strong t-insert="person.name">Some body</strong></p>
+    <p>Species: <em t-insert="person.species">Some species</em></p>
+    <p t-show="person.injuries">
+        Injuries: <span t-replace="person.injuries">Some injuries</span>
     </p>
   </li>
-  <li tr-example>
+  <li t-example>
     <p>Name: <strong>Spiderman</strong></p>
     <p>Species: <em>Fish</em></p>
     <p>Injuries: Lots of hurt</p>
   </li>
 </ul>
 
-<p>Hello <span tr-replace="replace_word">world</span>.</p>
+<p>Hello <span t-replace="replace_word">world</span>.</p>
 
-<tr-replace>green</tr-replace>
+<t-replace>green</t-replace>
 
   </body>
 </html>
