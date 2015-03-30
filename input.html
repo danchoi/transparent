@@ -1,13 +1,13 @@
 <div>Wizard {{wizard.name}}</div>
 <ul>
-  <li t-repeat="person in party" 
-      t-hide="person.injuries && person.injuries > 9"
-      t-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', 
+  <li tr-repeat="person in party" 
+      tr-hide="person.injuries && person.injuries > 9"
+      tr-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', 
                  injured: person.injuries}">
-    <p>Name: <strong t-insert="person.name"></strong></p>
+    <p>Name: <strong tr-insert="person.name"></strong></p>
     <p>Species: <em>{{person.species}}</em></p>
-    <p t-show="person.injuries">Injuries: {{person.injuries}}</p>
+    <p tr-show="person.injuries">Injuries: {{person.injuries}}</p>
   </li>
 </ul>
 
-<p>Hello <span t-replace="replace_word">world</span></p>
+<p>Hello <span tr-replace="replace_word">world</span></p>
