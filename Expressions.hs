@@ -21,7 +21,7 @@ import qualified Data.Map.Strict as M
 
 -- see doc for AngularJS expressions https://docs.angularjs.org/guide/expression
 
-data TmplExprTopLevel = TmplExprTopLevel TmplExpr (Maybe TmplFilter)
+data TmplExprTopLevel = TmplExprTopLevel TmplExpr 
     deriving (Show, Eq)
 
 data TmplExpr = TmplKeyPath [JSKey]
@@ -36,12 +36,6 @@ data TmplExpr = TmplKeyPath [JSKey]
             | TmplMap (M.Map String TmplExpr)
             | TmplLiteral Value
       deriving (Show, Eq)
-
--- See https://docs.angularjs.org/api/ng/filter/filter
--- IN PROGRESS
-data TmplFilter = TmplFilter FilterName (Maybe TmplExpr) deriving (Show, Eq) 
-type FilterName = String
-type FilterArg = String
 
 data JSKey = ObjectKey Text 
            | ArrayIndex Int  
@@ -61,7 +55,7 @@ type TmplExprParser = ParsecT String () Identity
 
 symbol s = spaces *> string s <* spaces
 
-templateExprTopLevel = TmplExprTopLevel <$> templateExpr <*> (optionMaybe $ spaces >> templateFilter)
+templateExprTopLevel = TmplExprTopLevel <$> templateExpr 
 
 templateExpr = do
     templateMap <|> (do
@@ -75,11 +69,6 @@ templateExpr = do
        <|> try (do op <- comparisonOp; expr2 <- templateExpr; return $ Compare op expr1 expr2) 
        <|> return expr1)
 
-templateFilter = do
-      char '|'  >> spaces
-      name <- templateVarName
-      arg <- optionMaybe (char ':' >> spaces >> templateExprTerm)
-      return $ TmplFilter name arg
 
 templateMap = do
     char '{' >> spaces
@@ -338,7 +327,7 @@ tests = test [
                                Compare "==" (TmplKeyPath [ObjectKey "test"]) (TmplLiteral (Number 1))
                                @=? runParse templateExpr "test == 1"
   , "parse top level ng expr" ~: 
-                               TmplExprTopLevel (TmplKeyPath [ObjectKey "item",ObjectKey "price"]) (Just (TmplFilter "number" (Just (TmplLiteral (Number 2.0)))))
+                               TmplExprTopLevel (TmplKeyPath [ObjectKey "item",ObjectKey "price"]) 
                                @=? runParse templateExprTopLevel "item.price | number:2"
   , "disjunction left"      ~: "apple"               @=? templateEvalToString testContext1 "item || another" 
   , "disjunction right"     ~: "10"                  @=? templateEvalToString testContext1 "blah || another" 
