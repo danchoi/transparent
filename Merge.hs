@@ -6,18 +6,18 @@ import Text.XML.HXT.Core
 
 main = do
     [layout,content] <- getArgs
-    processTemplateWithLayout layout content >> return ()
+    processTemplateWithLayout layout content "content" >> return ()
 
 
-processTemplateWithLayout layoutFile contentFile = runX (
+processTemplateWithLayout layoutFile contentFile idName = runX (
     (
       (\contentXml -> 
           readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] layoutFile
           >>> 
-          processTopDown ((constA contentXml) `when` (isElem >>> hasName "yield"))
+          processTopDown ((constA contentXml) `when` (isElem >>> hasName "yield" >>> hasAttrValue "id" (== idName)))
       )
       $< (readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] contentFile 
-          >>> (deep (isElem >>> hasAttrValue "id" (== "content"))) `when` isElem)
+          >>> (deep (isElem >>> hasAttrValue "id" (== idName))) `when` isElem)
     )
     >>>
     writeDocument [withIndent yes, withOutputHTML, withXmlPi no] "-"
