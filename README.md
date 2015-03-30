@@ -12,7 +12,9 @@ In progress.
     classDirective = "tr-class"
     exampleDirective = "tr-example"
 
+input.html
 
+input.json
 
 
 ### t-replace
