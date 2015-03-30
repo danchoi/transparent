@@ -27,6 +27,12 @@ data TmplRepeatContext = TmplRepeatContext Text Value
     deriving Show
 
 
+showDirective = "t-show"
+hideDirective = "t-hide"
+repeatDirective = "t-repeat"
+insertDirective = "t-insert"
+replaceDirective = "t-replace"
+classDirective = "t-class"
 
 processTemplate file context = runX (
     readDocument [withValidate no, withParseHTML yes, withInputEncoding utf8] file
@@ -60,14 +66,12 @@ process :: Value -> IOSArrow XmlTree XmlTree
 process context = normalTmplProcess context
 
 normalTmplProcess context = processTopDown (
-      templateRepeat context `when` hasTmplAttr "ng-repeat"
+      templateRepeat context `when` hasTmplAttr repeatDirective
       >>> interpolateValues context 
       >>> templateClass context
       >>> templateShow context 
       >>> templateHide context  
       >>> templateBind context
-      >>> templateBindHtml context
-      >>> templateBindHtmlUnsafe context
     )
 
 ------------------------------------------------------------------------
@@ -91,13 +95,8 @@ templateBindBase tag context =
       ) >>> removeAttr tag
     ) `when` hasTmplAttr tag
 
-templateBind = templateBindBase "ng-bind"
-templateBindHtml = templateBindBase "ng-bind-html"
-templateBindHtmlUnsafe = templateBindBase "ng-bind-html-unsafe"
+templateBind = templateBindBase insertDirective
 
--- ng-bind-html
-
--- ng-bind-html-unsafe
 
 ------------------------------------------------------------------------
 -- templateShow
@@ -105,18 +104,18 @@ templateShow :: ArrowXml a => Value -> a XmlTree XmlTree
 templateShow context = 
     (
       ((\boolVal -> if boolVal then this else none) 
-        $< (getAttrValue "ng-show" >>> arr (templateEvalToBool context . T.pack))
-      ) >>> removeAttr "ng-show"
-    ) `when` hasTmplAttr "ng-show"
+        $< (getAttrValue showDirective >>> arr (templateEvalToBool context . T.pack))
+      ) >>> removeAttr showDirective
+    ) `when` hasTmplAttr showDirective
 
 -- Not DRY. refactor later
 templateHide :: ArrowXml a => Value -> a XmlTree XmlTree
 templateHide context = 
     (
       ((\boolVal -> if boolVal then none else this) 
-        $< (getAttrValue "ng-hide" >>> arr (templateEvalToBool context . T.pack))
-      ) >>> removeAttr "ng-hide"
-    ) `when` hasTmplAttr "ng-hide"
+        $< (getAttrValue hideDirective >>> arr (templateEvalToBool context . T.pack))
+      ) >>> removeAttr hideDirective
+    ) `when` hasTmplAttr hideDirective
 
 
 templateClass context = 
@@ -128,9 +127,9 @@ templateClass context =
             changeAttrValue (\old -> mconcat [old, " ", newClassNames]) `when` hasName "class"
           )
               -- addAttr "class" classNames
-      ) $< (getAttrValue "ng-class" >>> arr (templateEvalToString context))
-      ) >>> removeAttr "ng-class"
-    ) `when` hasTmplAttr "ng-class"
+      ) $< (getAttrValue classDirective >>> arr (templateEvalToString context))
+      ) >>> removeAttr classDirective
+    ) `when` hasTmplAttr classDirective
      
 ------------------------------------------------------------------------
 -- templateRepeat
@@ -142,7 +141,7 @@ templateRepeat context =
 
 templateRepeatKeys :: Value -> IOSArrow XmlTree TmplRepeatContext
 templateRepeatKeys outerContext = 
-      getAttrValue "ng-repeat" 
+      getAttrValue repeatDirective 
       >>> traceValue 2 (show)
       >>> arr parseTmplRepeatExpr
   where parseTmplRepeatExpr :: String -> TmplRepeatContext
@@ -157,7 +156,7 @@ templateRepeatContext c@(Object context) nrp@(TmplRepeatContext iterVarName repe
     (\iterVar ->
       traceMsg 2 ("* templateRepeatContext with templateRepeatKeys " ++ show nrp) 
       >>>
-      removeAttr "ng-repeat" 
+      removeAttr repeatDirective 
       >>>
       let mergedContext = Object $ HM.insert iterVarName iterVar context
       in (
