@@ -72,6 +72,7 @@ normalTmplProcess context = processTopDown (
       >>> templateShow context 
       >>> templateHide context  
       >>> templateBind context
+      >>> templateReplace context
     )
 
 ------------------------------------------------------------------------
@@ -96,6 +97,19 @@ templateBindBase tag context =
     ) `when` hasTmplAttr tag
 
 templateBind = templateBindBase insertDirective
+
+-- | Replaces the element with the evaluated content
+
+templateReplace :: ArrowXml a => Value -> a XmlTree XmlTree
+templateReplace context =
+    (
+        -- this replaces the element
+        getAttrValue replaceDirective >>> 
+        arr (templateEvalToString context) >>>
+        xread
+    ) 
+    `when`
+    hasTmplAttr replaceDirective 
 
 
 ------------------------------------------------------------------------
