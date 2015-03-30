@@ -19,5 +19,6 @@ In progress.
 
     # output 
 
-    <p>Hello <span t-replace="replace_word">world</span></p>
+    <p>Hello WORLD</p>
+
 
