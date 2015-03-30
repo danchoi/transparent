@@ -68,4 +68,48 @@ generates
     <li class="hobbit" id="person-Bilbo">
       <p>Name: <strong>Bilbo</strong></p>
     </li>
-  
+
+### Merging templates
+
+
+```html
+<html>
+  <head>
+    <title>Layout example</title>
+  </head>
+  <body>
+    <h1>Layout</h1>
+    <yield/>
+  </body>
+</html>
+```
+
+```html
+<html>
+  <head>
+    <title>Content example</title>
+  </head>
+  <body>
+    <h1>Content layout</h1>
+    <div id="content">
+      <p>This is content</p>
+    </div>
+  </body>
+</html>
+```
+
+$ dist merge-templates layout.html content.html  
+
+```html
+<html>
+  <head>
+    <title>Layout example</title>
+  </head>
+  <body>
+    <h1>Layout</h1>
+    <div id="content">
+      <p>This is content</p>
+    </div>
+  </body>
+</html>
+```
