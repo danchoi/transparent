@@ -8,8 +8,8 @@ import Text.XML.HXT.Arrow.XmlArrow
 main = do
     -- todo optparse the command line
     let layout = "layout.html"
-    -- let xs = [("content.html", "content"), ("sidebar.html", "sidebar")]
-    let xs = []
+    let xs = [("content.html", "content"), ("sidebar.html", "sidebar")]
+    -- let xs = []
     runX (
       (
         foldl (\acc x -> acc >>> mergeTemplates x) 

@@ -6,7 +6,8 @@
   "party": [
     {
       "name": "Thorin",
-      "species": "dwarf"
+      "species": "dwarf",
+      "injuries": 14
     },
     {
       "name": "Fili",

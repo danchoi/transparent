@@ -10,7 +10,7 @@
 <div>Wizard <span t-replace="wizard.name">Sauruman</span></div>
 <ul>
   <li t-repeat="person in party" 
-      t-hide="person.injuries && person.injuries > 9"
+      t-hide="person.injuries && person.injuries > 13"
       t-class="{dwarf: person.species == 'dwarf', hobbit: person.species == 'hobbit', injured: person.injuries}"
       class="replace-this-class"
       id="person-{{person.name}}">
