@@ -1,4 +1,4 @@
-# transparent
+# t5
 
 another templating engine
 
@@ -100,7 +100,7 @@ content.html
 </html>
 ```
 
-$ dist merge-templates layout.html content.html  
+$ dist t5merge layout.html content.html  
 
 ```html
 <html>
